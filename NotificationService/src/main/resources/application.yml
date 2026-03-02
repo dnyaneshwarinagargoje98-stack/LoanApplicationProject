@@ -1,0 +1,28 @@
+server:
+  port: 9002
+  
+spring:
+  application:
+    name: NotificationService
+    
+  mail:
+    host: smtp.gmail.com
+    password: gkqh awld kewx xeot
+    port: 587
+    
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+            
+    username: dnyaneshwarinagargoje98@gmail.com
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka    

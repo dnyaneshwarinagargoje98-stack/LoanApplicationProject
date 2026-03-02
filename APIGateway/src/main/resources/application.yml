@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: APIGateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: CUSTOMERSERVICE
+          uri: lb://CUSTOMERSERVICE
+          predicates:
+            - Path=/auth/**,/customer/**
+
+        - id: ADMINSERVICE
+          uri: lb://ADMINSERVICE
+          predicates:
+            - Path=/admin/**
+        
+        - id: NOTIFICATIONSERVICE 
+          uri: lb://NOTIFICATIONSERVICE 
+          predicates:
+           - Path=/notification/**
+
+        - id: LOANSERVICE 
+          uri: lb://LOANSERVICE 
+          predicates:
+           - Path=/loan/**
+        
