@@ -11,6 +11,8 @@ import com.example.demo.dto.EmiRequestDto;
 import com.example.demo.entity.Loan;
 import com.example.demo.globalException.InvalidLoanStateException;
 import com.example.demo.globalException.LoanNotFoundException;
+import com.example.demo.model.LoanEvent;
+import com.example.demo.producer.LoanEventProducer;
 import com.example.demo.repository.LoanRepository;
 
 
@@ -21,7 +23,10 @@ public class LoanServiceImpl implements LoanService {
 
 	@Autowired
 	private LoanRepository loanRepo;
-
+	
+	@Autowired
+	private LoanEventProducer loanEventProducer;
+	
 	@Override
 	public Loan applyLoan(Loan loan) {
 		log.info("Applying loan for customerId: {}", loan.getCustomerId());
@@ -104,7 +109,16 @@ public class LoanServiceImpl implements LoanService {
 
 	    loan.setStatus("APPROVED");
 	    loan.setApprovalDate(LocalDate.now());
-	    return loanRepo.save(loan);
+	    
+	    Loan savedLoan = loanRepo.save(loan);
+	    
+	    LoanEvent event = new LoanEvent(savedLoan.getLoanId(),
+	    		savedLoan.getCustomerId(), 
+	    		savedLoan.getLoanAmount(), "APPROVED");
+	    
+	    loanEventProducer.publishLoanEvent(event);
+	    
+	    return savedLoan;
 	}
 	
 	@Override
@@ -120,7 +134,15 @@ public class LoanServiceImpl implements LoanService {
 		loan.setApprovalDate(LocalDate.now());
 
 		log.info("Loan rejected successfully, loanId: {}", loanId);
-		return loanRepo.save(loan);
+		 Loan savedLoan = loanRepo.save(loan);
+		 
+		 LoanEvent event = new LoanEvent(savedLoan.getLoanId(),
+		    		savedLoan.getCustomerId(), 
+		    		savedLoan.getLoanAmount(), "REJECTED");
+		    
+		    loanEventProducer.publishLoanEvent(event);
+		    
+		 return savedLoan;
 	}
 
 	@Override
